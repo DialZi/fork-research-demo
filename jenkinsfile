@@ -17,10 +17,12 @@ pipeline{
         stage ('Source Composition Analysis') {
               environment {
         my_dojoKey = credentials('defectDojoApiKey')
+        my_githubKey = credentials('githubapikey')
+
     }
       steps {
          sh 'rm owasp* || true'
-         sh 'wget "https://raw.githubusercontent.com/domi810/pipeline/master/owasp-dependency-check.sh" '
+         sh 'wget --header "Authorization: token $my_githubKey"  "https://raw.githubusercontent.com/domi810/pipeline_demo/master/owasp-dependency-check.sh"'
          sh 'chmod +x owasp-dependency-check.sh'
          sh 'bash owasp-dependency-check.sh'
          sh 'cat /home/jenkins/workspace/demopipe/dependency-check-report.xml'
@@ -35,11 +37,9 @@ pipeline{
     }
 
             stage ('Test'){
-                  agent {
-        docker { image 'node:14-alpine' }
-    }
       steps{
-        sh 'node --version'
+        sh 'docker run -d -p 8085:8080 --rm -v /home/jenkins/workspace/demopipe/target/pipeline-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/pipeline-0.0.1-SNAPSHOT.war --name webgoattest tomcat'
+        sh 'docker inspect -f "{{ .NetworkSettings.IPAddress }}" webgoattest'
       }
     }
   }
