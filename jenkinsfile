@@ -38,8 +38,11 @@ pipeline{
 
             stage ('Test'){
       steps{
+        sh 'docker container stop apptest'
         sh 'docker run -d -p 8085:8080 --rm -v /home/jenkins/workspace/demo/target/pipeline-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/pipeline-0.0.1-SNAPSHOT.war --name apptest tomcat'
         sh 'docker inspect -f "{{ .NetworkSettings.IPAddress }}" apptest'
+        sh 'curl 172.17.0.2:8085'
+        sh 'docker container stop apptest'
       }
     }
   }
