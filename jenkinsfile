@@ -22,10 +22,10 @@ pipeline{
     }
       steps {
          sh 'rm owasp* || true'
-         sh 'wget --header "Authorization: token $my_githubKey"  "https://raw.githubusercontent.com/domi810/pipeline_demo/master/owasp-dependency-check.sh"'
+         sh 'wget --header "Authorization: token $my_githubKey"  "https://raw.githubusercontent.com/domi810/demo/master/owasp-dependency-check.sh"'
          sh 'chmod +x owasp-dependency-check.sh'
          sh 'bash owasp-dependency-check.sh'
-         sh 'cat /home/jenkins/workspace/demopipe/dependency-check-report.xml'
+         sh 'cat /home/jenkins/workspace/demo/dependency-check-report.xml'
          sh 'curl -X POST "http://172.16.1.4:8081/api/v2/import-scan/"  -H "Authorization: Token $my_dojoKey"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -H  "X-CSRFToken: f8lbpMWg07WXb3aJq83HbQeQ8r60HVDRvxKN6SJtywc3Pp9ExtlxqKFbXwlXer12" -F "scan_date=2021-01-09" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Dependency Check Scan" -F "file=@/home/jenkins/workspace/demopipe/dependency-check-report.xml;type=text/xml" -F "engagement=5" -F "close_old_findings=false" -F "push_to_jira=false"'
       }
     }
@@ -38,8 +38,8 @@ pipeline{
 
             stage ('Test'){
       steps{
-        sh 'docker run -d -p 8085:8080 --rm -v /home/jenkins/workspace/demopipe/target/pipeline-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/pipeline-0.0.1-SNAPSHOT.war --name webgoattest tomcat'
-        sh 'docker inspect -f "{{ .NetworkSettings.IPAddress }}" webgoattest'
+        sh 'docker run -d -p 8085:8080 --rm -v /home/jenkins/workspace/demo/target/pipeline-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/pipeline-0.0.1-SNAPSHOT.war --name apptest tomcat'
+        sh 'docker inspect -f "{{ .NetworkSettings.IPAddress }}" apptest'
       }
     }
   }
