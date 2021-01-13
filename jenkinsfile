@@ -41,7 +41,7 @@ pipeline{
         //make sure app is runnig
         sleep(time:5,unit:"SECONDS")
         //run zap docker
-        sh 'docker run --net zapnet -v $(pwd):/zap/wrk/ -t owasp/zap2docker-stable zap-baseline.py -t http://apptest:8080/pipeline-0.0.1-SNAPSHOT/ -r zap_report.html'
+        sh 'docker run --net zapnet -v /home/jenkins/workspace/demo/target:/zap/wrk/ -t owasp/zap2docker-stable zap-baseline.py -t http://apptest:8080/pipeline-0.0.1-SNAPSHOT/ -r zap_report.html'
 
         //stop test container
         sh 'docker container stop apptest'
