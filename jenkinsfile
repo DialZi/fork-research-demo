@@ -40,15 +40,21 @@ pipeline{
 
             stage ('Test'){
       steps{
+        //stop test container if already started
         sh 'docker container stop apptest || true'
+        //start docker with the test war
         sh 'docker run -d -p 8085:8080 --rm -v /home/jenkins/workspace/demo/target/pipeline-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/pipeline-0.0.1-SNAPSHOT.war --name apptest tomcat'
-        
-        environment {
-          def ip = sh 'docker inspect -f "{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}" apptest'
-        }
+        //run zap docker
+        sh 'docker run --net zapnet -t owasp/zap2docker-stable zap-baseline.py -t http://172.19.0.2:8080/pipeline-0.0.1-SNAPSHOT/'
+        ip = sh(script: 'docker inspect -f "{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}" apptest', returnStdout: true)
+
+        //def ip = sh 'docker inspect -f "{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}" apptest'
         sh 'echo $ip'
         sleep(time:20,unit:"SECONDS")
         sh 'curl "http://localhost:8085/pipeline-0.0.1-SNAPSHOT/"'
+
+
+
         sh 'docker container stop apptest'
       }
     }
