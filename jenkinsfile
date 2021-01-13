@@ -42,7 +42,7 @@ pipeline{
       steps{
         sh 'docker container stop apptest || true'
         sh 'docker run -d -p 8085:8080 --rm -v /home/jenkins/workspace/demo/target/pipeline-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/pipeline-0.0.1-SNAPSHOT.war --name apptest tomcat'
-        $ip = sh 'docker inspect -f "{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}" apptest'
+        def ip = sh 'docker inspect -f "{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}" apptest'
         sh 'echo $ip'
         sleep(time:20,unit:"SECONDS")
         sh 'curl "http://localhost:8085/pipeline-0.0.1-SNAPSHOT/"'
