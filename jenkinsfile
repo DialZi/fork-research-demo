@@ -26,7 +26,8 @@ pipeline{
          sh 'chmod +x owasp-dependency-check.sh'
          sh 'bash owasp-dependency-check.sh'
          sh 'cat /home/jenkins/workspace/demo/dependency-check-report.xml'
-         sh 'curl -X POST "http://172.16.1.4:8081/api/v2/import-scan/"  -H "Authorization: Token $my_dojoKey"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -H  "X-CSRFToken: f8lbpMWg07WXb3aJq83HbQeQ8r60HVDRvxKN6SJtywc3Pp9ExtlxqKFbXwlXer12" -F "scan_date=2021-01-09" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Dependency Check Scan" -F "file=@/home/jenkins/workspace/demo/dependency-check-report.xml;type=text/xml" -F "engagement=5" -F "close_old_findings=false" -F "push_to_jira=false"'
+         time=$(date +'%Y-%m-%d')
+         sh 'curl -X POST "http://172.16.1.4:8081/api/v2/import-scan/"  -H "Authorization: Token $my_dojoKey"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -H  -F "scan_date=${time} " -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Dependency Check Scan" -F "file=@/home/jenkins/workspace/demo/dependency-check-report.xml;type=text/xml" -F "engagement=5" -F "close_old_findings=false" -F "push_to_jira=false"'
       }
     }
 
