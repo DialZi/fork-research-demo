@@ -5,8 +5,6 @@ pipeline{
   }
 
   stages{
-    stage ('Initialize'){
-    }
 
        /* stage ('SCA / OWASP Dependency Check') {
               environment {
