@@ -18,7 +18,7 @@ pipeline{
               environment {
         my_dojoKey = credentials('defectDojoApiKey')
         my_githubKey = credentials('githubapikey')
-        def DATE = sh(script: "echo `date +%s`", returnStdout: true).trim()
+        def DATE = '2021-01-14'
 
     }
       steps {
