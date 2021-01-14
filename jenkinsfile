@@ -40,10 +40,10 @@ pipeline{
         sh 'docker run --net zapnet -d -p 8085:8080 --rm -v /home/jenkins/workspace/demo/target/pipeline-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/pipeline-0.0.1-SNAPSHOT.war --name apptest tomcat'
         //make sure app is runnig
         sleep(time:5,unit:"SECONDS")
-        //run zap docker
-        sh 'docker run --net zapnet -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/pipeline-0.0.1-SNAPSHOT/ -g gen.conf -r zap_report.xml'
+        //run zap docker. go on on error
+        sh 'docker run --net zapnet -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/pipeline-0.0.1-SNAPSHOT/ -g gen.conf -r zap_report.xml || true'
         //upload to defect dojo
-        sh 'curl -X POST "http://172.16.1.4:8081/api/v2/import-scan/"  -H "Authorization: Token $my_dojoKey"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -H  "X-CSRFToken: f8lbpMWg07WXb3aJq83HbQeQ8r60HVDRvxKN6SJtywc3Pp9ExtlxqKFbXwlXer12" -F "scan_date=2021-02-09" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/demo/zap/zap_report.xml;type=text/xml" -F "engagement=5" -F "close_old_findings=false" -F "push_to_jira=false" || true'
+        sh 'curl -X POST "http://172.16.1.4:8081/api/v2/import-scan/"  -H "Authorization: Token $my_dojoKey"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -H  "X-CSRFToken: f8lbpMWg07WXb3aJq83HbQeQ8r60HVDRvxKN6SJtywc3Pp9ExtlxqKFbXwlXer12" -F "scan_date=2021-02-09" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/demo/zap/zap_report.xml;type=text/xml" -F "engagement=5" -F "close_old_findings=false" -F "push_to_jira=false"'
         //stop test container
         sh 'docker container stop apptest'
       }
