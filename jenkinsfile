@@ -10,7 +10,6 @@ pipeline{
               environment {
         my_dojoKey = credentials('defectDojoApiKey')
         my_githubKey = credentials('githubapikey')
-        def DATE = '2021-01-14'
 
     }
       steps {
@@ -31,7 +30,10 @@ pipeline{
     }*/
 
     stage ('DAST / OWASP ZAP'){
-      steps{
+      environment {
+        my_dojoKey = credentials('defectDojoApiKey')
+      }
+      steps{  
         //stop test container if already started
         sh 'docker container stop apptest || true'
         //create network
