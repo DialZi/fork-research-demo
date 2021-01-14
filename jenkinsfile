@@ -5,7 +5,14 @@ pipeline{
   }
 
   stages{
-      stage ('SCA / OWASP Dependency Check') {
+
+        stage ('Build'){
+      steps{
+        sh 'mvn clean package'
+      }
+    }
+
+      stage ('SCA') {
         environment {
         my_dojoKey = credentials('defectDojoApiKey')
         my_githubKey = credentials('githubapikey')
@@ -20,13 +27,7 @@ pipeline{
       }
     }
 
-    stage ('Build'){
-      steps{
-        sh 'mvn clean package'
-      }
-    }
-
-    stage ('DAST / OWASP ZAP'){
+    stage ('DAST'){
       environment {
         my_dojoKey = credentials('defectDojoApiKey')
       }
@@ -39,11 +40,11 @@ pipeline{
         //create network
         sh 'docker network create zapnet || true'
         //start docker with the test war
-        sh 'docker run --net zapnet -d -p 8085:8080 --rm -v /home/jenkins/workspace/demo/target/pipeline-0.0.1-SNAPSHOT.war:/usr/local/tomcat/webapps/pipeline-0.0.1-SNAPSHOT.war --name apptest tomcat'
+        sh 'docker run --net zapnet -d -p 8085:8080 --rm -v /home/jenkins/workspace/demo/target/demoProject-0.0.1.war:/usr/local/tomcat/webapps/demoProject-0.0.1.war --name apptest tomcat'
         //make sure app is runnig
         sleep(time:5,unit:"SECONDS")
         //run zap docker. go on on error
-        sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/pipeline-0.0.1-SNAPSHOT/ -g gen.conf -x zap_report.xml || true'
+        sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/demoProject-0.0.1/ -g gen.conf -x zap_report.xml || true'
         //upload to defect dojo
         sh 'curl -X POST "http://172.16.1.4:8081/api/v2/import-scan/"  -H "Authorization: Token $my_dojoKey"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -H  "X-CSRFToken: f8lbpMWg07WXb3aJq83HbQeQ8r60HVDRvxKN6SJtywc3Pp9ExtlxqKFbXwlXer12" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/demo/zap/zap_report.xml;type=text/xml" -F "engagement=5" -F "close_old_findings=false" -F "push_to_jira=false"'
         //stop test container
