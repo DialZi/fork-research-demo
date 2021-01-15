@@ -6,18 +6,14 @@ pipeline{
 
   stages{
 
-        stage ('Build'){
-      steps{
-        sh 'mvn clean package'
-      }
-    }
+
 
       stage ('SCA') {
         environment {
-        my_dojoKey = credentials('defectDojoApiKey')
-        my_githubKey = credentials('githubapikey')
+          my_dojoKey = credentials('defectDojoApiKey')
+          my_githubKey = credentials('githubapikey')
          }
-      steps {
+        steps {
          sh 'rm owasp* || true'
          sh 'wget "https://raw.githubusercontent.com/domi810/demo/master/owasp-dependency-check.sh"'
          sh 'chmod +x owasp-dependency-check.sh'
@@ -27,14 +23,25 @@ pipeline{
       }
     }
 
+      stage ('SAST') {
+            steps {
+              withSonarQubeEnv('sonar') {
+                sh 'mvn sonar:sonar'
+                sh 'cat target/sonar/report-task.txt'
+              }
+            }
+          }
+
+    stage ('Build'){
+        steps{
+          sh 'mvn clean package'
+        }
+    }
     stage ('DAST'){
       environment {
         my_dojoKey = credentials('defectDojoApiKey')
       }
       steps{
-        script {
-            DATE_TAG = java.time.LocalDate.now()
-          }
         //stop test container if already started
         sh 'docker container stop apptest || true'
         //create network
