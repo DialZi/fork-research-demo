@@ -15,8 +15,9 @@ pipeline{
   stages{
 
 
-
-      stage ('SCA') {
+      stage ('Static Tests'){
+        parallel{
+                stage ('SCA') {
 
         steps {
           //remove file if exists
@@ -41,7 +42,11 @@ pipeline{
                 sh 'cat target/sonar/report-task.txt'
               }
             }
-          }
+        }
+        }
+      }
+
+
 
     stage ('Build'){
         steps{
