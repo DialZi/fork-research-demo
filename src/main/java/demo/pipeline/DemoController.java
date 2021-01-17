@@ -1,10 +1,11 @@
 package demo.pipeline;
 
-import java.util.Map;
 import java.util.Random;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -13,11 +14,22 @@ import org.springframework.web.servlet.ModelAndView;
 public class DemoController {
 
     @GetMapping
-    public ModelAndView demo(Map<String, Object> model) {
+    public String demoGet(Model model, String name) {
 
         Random rand = new Random();
-        model.put("text", rand.nextInt());
-        return new ModelAndView("demo", model);
+        if ((name == null) || (!name.isEmpty())) {
+            name = "unknown";
+        }
+        model.addAttribute("name", name);
+        return "demo";
+    }
+
+    @PostMapping
+    public String demoPost(Model model, String name) {
+
+        Random rand = new Random();
+        model.addAttribute("name", name);
+        return "demo";
     }
 
 }
