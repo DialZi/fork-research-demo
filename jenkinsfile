@@ -51,17 +51,27 @@ pipeline{
           sh 'mvn clean package'
         }
     }
-    stage ('DAST'){
+
+    stage ('DEPLOY TO TOMCAT'){
       steps{
         //stop test container if already started
         sh 'docker container stop apptest || true'
         //create network
         sh 'docker network create zapnet || true'
+        //change name of the war file do run the app under the root path
+        sh 'ls -l'
+        sh 'mv ${JAVA_PROJECT_NAME}.war ROOT.war'
+        sh 'ls -l'
         //start docker with the test war. make sure folder is owned by same uid as user zap in docker
-        sh 'docker run --net zapnet -d -p 8085:8080 --rm -v /home/jenkins/workspace/${JENKINS_PROJECT_NAME}/target/${JAVA_PROJECT_NAME}.war:/usr/local/tomcat/webapps/${JAVA_PROJECT_NAME}.war --name apptest tomcat'
+        sh 'docker run --net zapnet -d -p 8085:8080 --rm -v /home/jenkins/workspace/${JENKINS_PROJECT_NAME}/target/ROOT.war:/usr/local/tomcat/webapps/ROOT.war --name apptest tomcat'
         //make sure app is runnig
-        sleep(time:20,unit:"SECONDS")
+        sleep(time:10,unit:"SECONDS")
         sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/demoProject-0.0.1/'
+      }
+     }
+
+    stage ('DAST'){
+      steps{
         //run zap docker. go on on error
         sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/${JAVA_PROJECT_NAME}/ -j -g gen.conf -x zap_report.xml || true'
         //upload to defect dojo
