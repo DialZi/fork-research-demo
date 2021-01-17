@@ -57,7 +57,7 @@ pipeline{
         sh 'docker run --net zapnet -d -p 8085:8080 --rm -v /home/jenkins/workspace/${JENKINS_PROJECT_NAME}/target/${JAVA_PROJECT_NAME}.war:/usr/local/tomcat/webapps/${JAVA_PROJECT_NAME}.war --name apptest tomcat'
         //make sure app is runnig
         sleep(time:20,unit:"SECONDS")
-        sh 'curl http://apptest:8080/${JAVA_PROJECT_NAME}/'
+        sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/demoProject-0.0.1/'
         //run zap docker. go on on error
         sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/${JAVA_PROJECT_NAME}/ -g gen.conf -x zap_report.xml || true'
         //upload to defect dojo
