@@ -1,8 +1,22 @@
-<h1>Hello {{name}}</h1>
+{{>header}}
 
-<form action="/demo" method="post" autocomplete="off">
-  <label for="name">Vorname</label> 
-  <input id="name" name="name" maxlength="100">
-  <button type="submit" name="action" value="0">Senden</button>
+<body>
+  <div class="container">
 
-</form>
+    <h1 id="nameTitle"></h1>
+
+
+
+    <label for="name">Vorname</label>
+    <input id="nameInput" name="name" maxlength="100">
+    <button onclick="myFunction()" name="action" value="0">Senden</button>
+
+  </div>
+</body>
+<script>
+  function myFunction() {
+    document.getElementById("nameTitle").innerHTML = "Hello " + document.getElementById("nameInput").value;
+  }   
+</script>
+
+{{>footer}}
