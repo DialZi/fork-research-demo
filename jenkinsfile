@@ -59,7 +59,7 @@ pipeline{
         sleep(time:20,unit:"SECONDS")
         sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/demoProject-0.0.1/'
         //run zap docker. go on on error
-        sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/${JAVA_PROJECT_NAME}/demo -g gen.conf -x zap_report.xml || true'
+        sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/${JAVA_PROJECT_NAME}/ -j -g gen.conf -x zap_report.xml || true'
         //upload to defect dojo
         sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
         //stop test container
