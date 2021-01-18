@@ -14,6 +14,7 @@ public class PipelineApplication extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) throws Exception {
+        
         SpringApplication.run(PipelineApplication.class, args);
     }
 
