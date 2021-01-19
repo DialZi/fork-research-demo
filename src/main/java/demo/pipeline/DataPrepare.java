@@ -36,17 +36,17 @@ public class DataPrepare {//https://www.tutorialspoint.com/h2_database/h2_databa
             PreparedStatement prepStmt = conn.prepareStatement(sql);
             String imagePath = "images/Smarties-Torte.jpg";
             prepStmt.setString(1, "Smarties Torte");
-            prepStmt.setDouble(2, 11.50);
+            prepStmt.setDouble(2, 15);
             prepStmt.setBinaryStream(3, new FileInputStream(new File(imagePath)), (int) new File(imagePath).length());
             prepStmt.executeUpdate();
             imagePath = "images/Peanutbutter-Torte.jpg";
             prepStmt.setString(1, "Peanutbutter Torte");
-            prepStmt.setDouble(2, 50.00);
+            prepStmt.setDouble(2, 50);
             prepStmt.setBinaryStream(3, new FileInputStream(new File(imagePath)), (int) new File(imagePath).length());
             prepStmt.executeUpdate();
             imagePath = "images/Igel-Torte.jpg";
             prepStmt.setString(1, "Igel Torte");
-            prepStmt.setDouble(2, 29.90);
+            prepStmt.setDouble(2, 30);
             prepStmt.setBinaryStream(3, new FileInputStream(new File(imagePath)), (int) new File(imagePath).length());
             prepStmt.executeUpdate();
 

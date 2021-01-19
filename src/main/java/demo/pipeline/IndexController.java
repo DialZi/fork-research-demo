@@ -65,6 +65,7 @@ public class IndexController {
                 productList.add(new Product(Name, Price, Image));
             }
             model.addAttribute("Products", productList);
+            
 
             // STEP 4: Clean-up environment
             stmt.close();
