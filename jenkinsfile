@@ -33,7 +33,10 @@ pipeline{
       }
     }
 
-      stage ('SAST SONAR') {
+      stage ('SAST'){
+        steps{
+          parallel{
+            stage ('SONARQUBE') {
             steps {
               //run sonarqube
               withSonarQubeEnv('sonarserver') {
@@ -45,7 +48,7 @@ pipeline{
         
             }
         }
-       stage ('SAST SHIFT LEFT') {
+       stage ('SHIFT LEFT') {
             steps {
               //run shif left scan
               sh 'docker run --rm -e "WORKSPACE=${PWD}" -v $PWD:/app shiftleft/sast-scan scan --build --out_dir /app/reports || true'
@@ -57,6 +60,11 @@ pipeline{
 
             }
         }
+
+          }
+        }
+      }
+      
 
     stage ('Build'){
         steps{
