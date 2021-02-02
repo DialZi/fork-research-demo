@@ -5,7 +5,7 @@ pipeline{
   }
 
   environment {
-        DEFECT_DOJO_ENGAGEMENT_ID = '6'
+        DEFECT_DOJO_ENGAGEMENT_ID = '7'
         DEFECT_DOJO_IP = 'http://172.16.1.4:8081'
         DEFECT_DOJO_KEY = credentials('defectDojoApiKey')
         JAVA_PROJECT_NAME= 'demoProject-0.0.1'
