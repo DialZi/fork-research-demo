@@ -17,7 +17,7 @@ pipeline{
         steps {
                   //workarounds for testing
         sh 'docker-compose -f /home/domi/django-DefectDojo/docker-compose.yml up -d || true'
-        sh 'docker run -d -p 9000:9000 sonarqube || true'
+        sh 'docker run -d -p 9000:9000 --name sonarqube_jenkins sonarqube || true'
         }
 
       }
