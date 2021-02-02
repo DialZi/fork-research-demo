@@ -13,7 +13,12 @@ pipeline{
         DEPENDENCY_CHECK_URL = 'https://raw.githubusercontent.com/domi810/demo/master/owasp-dependency-check.sh'
     }
   stages{
+      stage ('INIT'){
+        //workarounds for testing
+        sh 'docker-compose -f /home/domi/django-DefectDojo/docker-compose.yml up -d || true'
+        sh 'docker run -d -p 9000:9000 sonarqube || true'
 
+      }
 
       stage ('SCA') {
 
