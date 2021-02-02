@@ -40,7 +40,7 @@ public class IndexController {
     static final String PASS = "password";
 
     @GetMapping
-    public String index(Model model) {
+    public String index(Model model,String searchTerm) {
 
         Connection conn = null;
         Statement stmt = null;
