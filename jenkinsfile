@@ -34,7 +34,6 @@ pipeline{
     }
 
       stage ('SAST'){
-        steps{
           parallel{
             stage ('SONARQUBE') {
             steps {
@@ -62,7 +61,6 @@ pipeline{
         }
 
           }
-        }
       }
       
 
