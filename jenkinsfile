@@ -33,9 +33,9 @@ pipeline{
       }
     }
 
-      stage ('SAST') {
+      stage ('SAST SONAR') {
             steps {
-              //rin sonarqube
+              //run sonarqube
               withSonarQubeEnv('sonarserver') {
                 sh 'mvn sonar:sonar'
                 sh 'cat target/sonar/report-task.txt'
@@ -43,6 +43,18 @@ pipeline{
               //trigger defect dojo sonarqube api import
               sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SonarQube API Import" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
         
+            }
+        }
+       stage ('SAST SHIFT LEFT') {
+            steps {
+              //run shif left scan
+              sh 'docker run --rm -it -e "WORKSPACE=${PWD}" -v $PWD:/app shiftleft/sast-scan scan --build --out_dir /app/reports'
+              //upload to defect dojo
+              sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/bash-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+              sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/class-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+              sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/source-java-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+              sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/source-sql-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+
             }
         }
 
