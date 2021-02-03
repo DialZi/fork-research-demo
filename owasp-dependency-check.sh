@@ -25,9 +25,13 @@ docker run --rm \
     --volume "$DATA_DIRECTORY":/usr/share/dependency-check/data:z \
     --volume $(pwd)/:/report:z \
     owasp/dependency-check:$DC_VERSION \
+    --name dependency_check
     --scan /src \
     --format "ALL" \
     --project "$DC_PROJECT" \
     --out /report
     # Use suppression like this: (where /src == $pwd)
     # --suppression "/src/security/dependency-check-suppression.xml"
+
+
+docker container stop dependency_check
