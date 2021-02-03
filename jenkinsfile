@@ -51,10 +51,14 @@ pipeline {
     stage('Build') {
       steps {
         sh 'mvn clean package'
+        //change name of the war file do run the app under the root path
+        sh 'cd target && ls -l'
+        sh 'mv target/${JAVA_PROJECT_NAME}.war target/ROOT.war'
+        sh 'cd target && ls -l'
       }
     }
 
-   /* stage('SCA - OWSAP Dependency Check') {
+    /*stage('SCA - OWSAP Dependency Check') {
 
       steps {
         //remove file if exists
@@ -109,10 +113,6 @@ pipeline {
         sh 'docker container stop apptest || true'
         //create network
         sh 'docker network create zapnet || true'
-        //change name of the war file do run the app under the root path
-        sh 'cd target && ls -l'
-        sh 'mv target/${JAVA_PROJECT_NAME}.war target/ROOT.war'
-        sh 'cd target && ls -l'
         //start docker with the test war. make sure folder is owned by same uid as user zap in docker
         sh 'docker run --net zapnet -d -p 8085:8080 --rm -v /home/jenkins/workspace/${JENKINS_PROJECT_NAME}/target/ROOT.war:/usr/local/tomcat/webapps/ROOT.war --name apptest tomcat'
         //make sure app is runnig
@@ -125,7 +125,7 @@ pipeline {
         //stop test container
         sh 'docker container stop apptest'
       }
-    }*/
+    */}
 
     stage('BUILD DOCKER IMAGE'){
       steps{
