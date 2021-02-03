@@ -1,16 +1,19 @@
 package demo.pipeline;
 
+import java.sql.Blob;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class Product {
 
+    @Id
+    @GeneratedValue
+    public int Id;
     public String Name;
     public Double Price;
+    public String ImagePath;
     public String Image;
-
-    public Product(String Name, Double Price, String Image) {
-        this.Name = Name;
-        this.Price = Price;
-        this.Image = Image;
-    }
-
 }
