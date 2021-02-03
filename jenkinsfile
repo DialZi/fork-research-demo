@@ -35,6 +35,7 @@ pipeline {
     JENKINS_PROJECT_NAME = 'demo'
     DEPENDENCY_CHECK_URL = 'https://raw.githubusercontent.com/domi810/demo/master/owasp-dependency-check.sh'
     CLAIR_SCANNER_URL = 'https://raw.githubusercontent.com/domi810/demo/master/clair-scanner_linux_386'
+    DOCKERFILE_URL = 'https://raw.githubusercontent.com/domi810/demo/master/Dockerfile'
   }
   stages {
     stage('INIT') {
@@ -126,8 +127,19 @@ pipeline {
       }
     }
 
+    stage('BUILD DOCKER IMAGE'){
+      steps{
+        //remove binary if exists
+        sh 'rm Dockerfile* || true'
+        //get newest binary
+        sh 'wget ${DOCKERFILE_URL}'
+      }
+    }
+
     stage('DOCKER IMAGE SECURITY - Clair ') {
       steps {
+        //remove binary if exists
+        sh 'rm clair-scanner_* || true'
         //get newest binary
         sh 'wget ${CLAIR_SCANNER_URL}'
         //make executable
