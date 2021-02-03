@@ -54,7 +54,7 @@ pipeline {
       }
     }
 
-    stage('SCA - OWSAP Dependency Check') {
+   /* stage('SCA - OWSAP Dependency Check') {
 
       steps {
         //remove file if exists
@@ -125,7 +125,7 @@ pipeline {
         //stop test container
         sh 'docker container stop apptest'
       }
-    }
+    }*/
 
     stage('BUILD DOCKER IMAGE'){
       steps{
