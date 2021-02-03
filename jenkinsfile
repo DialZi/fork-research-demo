@@ -1,3 +1,23 @@
+/*
+jenkins:localhost:8080
+
+defect dojo: localhost:8081
+  git clone https://github.com/DefectDojo/django-DefectDojo
+
+sonarqube: localhost:9000
+  get api key.
+  set sonarqube api key in jenkins and defect dojo
+  defect dojo set sonarqube api key: 
+    url: Home/Tool Configuration List/Edit Tool Configuration
+    set url=http://{sonarqube}/api, toolType=SonarQube, authentication type=API Key, username+API Key = sonarqube API Key
+
+
+
+
+
+*/
+
+
 pipeline{
   agent any
   tools {
@@ -15,9 +35,10 @@ pipeline{
   stages{
       stage ('INIT'){
         steps {
-                  //workarounds for testing
+        //workarounds for testing
         sh 'docker-compose -f /home/domi/django-DefectDojo/docker-compose.yml up -d || true'
         sh 'docker run -d -p 9000:9000 --name sonarqube_jenkins sonarqube || true'
+        sh 'docker container start sonarqube_jenkins || true'
         }
 
       }
