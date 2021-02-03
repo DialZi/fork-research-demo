@@ -11,25 +11,10 @@ sonarqube: localhost:9000
     url: Home/Tool Configuration List/Edit Tool Configuration
     set url=http://{sonarqube}/api, toolType=SonarQube, authentication type=API Key, username+API Key = sonarqube API Key
 
-clair: update ports in docker compose file
-
-
-
-
 ports:
-5432  clair
-5672  clair rabbitmq
-6000  clair traefik
-7000  clair traefik
 8080  jenkins
 8081  defect dojo
-8082  clair pg-admin
-8084  clair swagger ui
-8085  clair quay
-8087  clair rabbitmq
-8161  clair activemq
 9000  sonarqube
-61613 clair activemq
 
 
 
@@ -154,8 +139,8 @@ pipeline{
         //make executable
         sh 'chmod +x clair-scanner_linux_386'
         //run clair containers
-        sh 'docker run --rm -p 5432:5432 -d --name clair_db arminc/clair-db:latest'
-        sh 'docker run --rm -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:latest'
+        sh 'docker run --rm -p 5432:5432 -d --name clair_db arminc/clair-db:latest || true'
+        sh 'docker run --rm -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:latest || true'
         //scan image
         sh './clair-scanner_linux_386  --ip 172.17.0.1 -r clair_report.json postgres'
         sh 'cat clair_report.json'
