@@ -84,7 +84,7 @@ pipeline{
        stage ('SHIFT LEFT') {
             steps {
               //run shif left scan
-              sh 'docker run --rm -e "WORKSPACE=${PWD}" -v $PWD:/app shiftleft/sast-scan scan --name shift_left_scan --build --out_dir /app/reports || true'
+              sh 'docker run --rm -e "WORKSPACE=${PWD}" -v $PWD:/app --name shift_left_scan shiftleft/sast-scan scan  --build --out_dir /app/reports || true'
               //upload to defect dojo
               sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/bash-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
               sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/class-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
@@ -146,8 +146,8 @@ pipeline{
         sh './clair-scanner_linux_386  --ip 172.17.0.1 -r clair_report.json postgres || true'
         sh 'cat clair_report.json'
         //stop clair containers
-        sh 'docker container stop clair_db'
-        sh 'docker container stop clair'
+        //sh 'docker container stop clair_db'
+        //sh 'docker container stop clair'
         //upload to defect dojo
         sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Clair Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/clair_report.json;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
       }
