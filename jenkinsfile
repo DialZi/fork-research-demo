@@ -59,6 +59,7 @@ pipeline{
          sh 'chmod +x owasp-dependency-check.sh'
          //run script
          sh 'bash owasp-dependency-check.sh'
+         sh 'docker container stop dependency_check || true'
          //cat for testing
          //sh 'cat /home/jenkins/workspace/${JENKINS_PROJECT_NAME}/dependency-check-report.xml'
          ///upload to defect dojo

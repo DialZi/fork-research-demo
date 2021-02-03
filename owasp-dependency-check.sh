@@ -34,4 +34,3 @@ docker run --rm \
     # --suppression "/src/security/dependency-check-suppression.xml"
 
 
-docker container stop dependency_check
