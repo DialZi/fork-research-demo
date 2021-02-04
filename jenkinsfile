@@ -243,7 +243,7 @@ stage('INIT DAST'){
             //stop container
             sh 'docker container stop nikto || true'
             //upload to defect dojo
-            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Nikto Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
             sh 'rm -r nikto'
           }
         }
