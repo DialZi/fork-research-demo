@@ -83,6 +83,28 @@ pipeline {
       }
     }
 
+    stage('DOCKER IMAGE SECURITY - Clair ') {
+      steps {
+        //remove binary if exists
+        sh 'rm clair-scanner_* || true'
+        //get newest binary
+        sh 'wget ${CLAIR_SCANNER_URL}'
+        //make executable
+        sh 'chmod +x clair-scanner_linux_386'
+        //run clair containers
+        sh 'docker run --rm -p 5432:5432 -d --name clair_db arminc/clair-db:latest || true'
+        sh 'docker run --rm -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:latest || true'
+        //scan image
+        sh './clair-scanner_linux_386  --ip 172.17.0.1 -r clair_report.json postgres || true'
+        sh 'cat clair_report.json'
+        //stop clair containers
+        sh 'docker container stop clair_db || true'
+        sh 'docker container stop clair || true'
+        //upload to defect dojo
+        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Clair Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/clair_report.json;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+      }
+    }
+
     stage('SCA - OWSAP Dependency Check') {
 
       steps {
@@ -151,28 +173,6 @@ pipeline {
         sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
         //stop test container
         sh 'docker container stop apptest'
-      }
-    }
-
-    stage('DOCKER IMAGE SECURITY - Clair ') {
-      steps {
-        //remove binary if exists
-        sh 'rm clair-scanner_* || true'
-        //get newest binary
-        sh 'wget ${CLAIR_SCANNER_URL}'
-        //make executable
-        sh 'chmod +x clair-scanner_linux_386'
-        //run clair containers
-        sh 'docker run --rm -p 5432:5432 -d --name clair_db arminc/clair-db:latest || true'
-        sh 'docker run --rm -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:latest || true'
-        //scan image
-        sh './clair-scanner_linux_386  --ip 172.17.0.1 -r clair_report.json postgres || true'
-        sh 'cat clair_report.json'
-        //stop clair containers
-        sh 'docker container stop clair_db || true'
-        sh 'docker container stop clair || true'
-        //upload to defect dojo
-        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Clair Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/clair_report.json;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
       }
     }
 
