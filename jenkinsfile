@@ -192,9 +192,11 @@ pipeline {
       }
     }*/
         stage('DAST'){
-          sh 'ls'
+       
           parallel{
              steps {
+stage('DAST - OWASP ZAP') {
+      steps {
         //stop test container if already started
         sh 'docker container stop apptest || true'
         //create network
@@ -213,9 +215,13 @@ pipeline {
         //stop test container
         sh 'docker container stop apptest'
 
+
+      }
+    }
+
           }
 
-                  stage('ARACHNI'){
+        stage('ARACHNI'){
           steps{
           //start cakefatory
           //sh 'docker run --net zapnet -d -p 8085:8080 --rm --name apptest cakefactory:latest'
