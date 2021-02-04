@@ -194,7 +194,6 @@ pipeline {
         stage('DAST'){
        
           parallel{
-             steps {
 stage('DAST - OWASP ZAP') {
       steps {
         //stop test container if already started
@@ -219,7 +218,6 @@ stage('DAST - OWASP ZAP') {
       }
     }
 
-          }
 
         stage('ARACHNI'){
           steps{
