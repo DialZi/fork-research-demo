@@ -44,6 +44,18 @@ pipeline {
     DOCKERFILE_URL = 'https://raw.githubusercontent.com/domi810/demo/master/Dockerfile'
   }
   stages {
+
+    stage('BUILD') {
+      steps {
+        sh 'mvn clean package'
+        //change name of the war file do run the app under the root path
+        sh 'cd target && ls -l'
+        sh 'mv target/${JAVA_PROJECT_NAME}.war target/ROOT.war'
+        sh 'cd target && ls -l'
+      }
+    }
+
+
     /*stage('INIT') {
       steps {
         //workarounds for testing
