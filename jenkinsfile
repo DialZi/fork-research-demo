@@ -36,6 +36,8 @@ pipeline {
     JAVA_PROJECT_NAME = 'demoProject-0.0.1'
     DOCKER_IMAGE_NAME = 'cakefactory'
     DOCKER_CONTAINER_NAME = 'cakefactory'
+    DOCKER_CONTAINER_NAME_DAST = 'cakefactory_dast'
+    DOCKER_DAST_NET_NAME = 'dastnet'
     JENKINS_PROJECT_NAME = 'demo'
     DEPENDENCY_CHECK_URL = 'https://raw.githubusercontent.com/domi810/demo/master/owasp-dependency-check.sh'
     CLAIR_SCANNER_URL = 'https://raw.githubusercontent.com/domi810/demo/master/clair-scanner_linux_386'
@@ -113,7 +115,7 @@ pipeline {
         sh 'docker container stop clair_db || true'
         sh 'docker container stop clair || true'
         //upload to defect dojo
-        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Clair Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/clair_report.json;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Clair Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/clair_report.json" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
       }
     }
 
@@ -132,7 +134,7 @@ pipeline {
         //cat for testing
         //sh 'cat /home/jenkins/workspace/${JENKINS_PROJECT_NAME}/dependency-check-report.xml'
         ///upload to defect dojo
-        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Dependency Check Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/dependency-check-report.xml;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Dependency Check Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/dependency-check-report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
       }
     }
 
@@ -155,10 +157,10 @@ pipeline {
             //run shif left scan
             sh 'docker run --rm -e "WORKSPACE=${PWD}" -v $PWD:/app --name shift_left_scan shiftleft/sast-scan scan  --build --out_dir /app/reports || true'
             //upload to defect dojo
-            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/bash-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
-            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/class-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
-            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/source-java-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
-            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/source-sql-report.sarif;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/bash-report.sarif" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/class-report.sarif" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/source-java-report.sarif" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SARIF" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/source-sql-report.sarif" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
 
           }
         }
@@ -184,36 +186,36 @@ pipeline {
         //run zap docker. go on on error. make sure folder is owned by same uid as user zap in docker
         sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/ -j -g gen.conf -x zap_report.xml || true'
         //upload to defect dojo
-        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
         //stop test container
         sh 'docker container stop apptest'
 
 
       }
     }*/
-        stage('DAST'){
-       sh 'ls'
-          parallel{
-stage('DAST - OWASP ZAP') {
-      steps {
+
+stage('INIT DAST'){
+  steps{
         //stop test container if already started
-        sh 'docker container stop apptest || true'
+        sh 'docker container stop ${DOCKER_CONTAINER_NAME_DAST} || true'
         //create network
-        sh 'docker network create zapnet || true'
-        //start docker with the test war. 
-        //sh 'docker run --net zapnet -d -p 8085:8080 --rm -v /home/jenkins/workspace/${JENKINS_PROJECT_NAME}/target/ROOT.war:/usr/local/tomcat/webapps/ROOT.war --name apptest tomcat'
+        sh 'docker network create ${DOCKER_DAST_NET_NAME} || true'
         //start cakefatory
-        sh 'docker run --net zapnet -d -p 8085:8080 --rm --name apptest cakefactory:latest'
+        sh 'docker run --net ${DOCKER_DAST_NET_NAME} -d -p 8085:8080 --rm --name ${DOCKER_CONTAINER_NAME_DAST} cakefactory:latest'
         //make sure app is runnig
         sleep(time: 10, unit: "SECONDS")
-        sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/'
-        //run zap docker. go on on error. make sure folder is owned by same uid as user zap in docker
-        sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/ -j -g gen.conf -x zap_report.xml || true'
-        //upload to defect dojo
-        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
-        //stop test container
-        sh 'docker container stop apptest'
+        sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm curlimages/curl http://${DOCKER_CONTAINER_NAME_DAST}:8080/'
+  }
+}
 
+        stage('DAST'){
+          parallel{
+        stage('OWASP ZAP') {
+      steps {
+        //run zap docker. make sure folder is owned by same uid as user zap in docker
+        sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://${DOCKER_CONTAINER_NAME_DAST}:8080/ -j -g gen.conf -x zap_report.xml || true'
+        //upload to defect dojo
+        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
 
       }
     }
@@ -221,14 +223,28 @@ stage('DAST - OWASP ZAP') {
 
         stage('ARACHNI'){
           steps{
-          //start cakefatory
-          //sh 'docker run --net zapnet -d -p 8085:8080 --rm --name apptest cakefactory:latest'
-          //make sure app is runnig
-          sleep(time: 10, unit: "SECONDS")
-          sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/'
-          sh 'docker run --net zapnet --rm -v $PWD/reports:/arachni/reports arachni/arachni:latest bin/arachni http://apptest:8080/ --report-save-path=reports/arachni_report.afr'
-          sh 'docker run --net zapnet --rm --name=arachni_report  -v $PWD/reports:/arachni/reports arachni/arachni:latest bin/arachni_reporter reports/arachni_report.afr --reporter=json:outfile=reports/arachni_report.json'
+          //start arachni container
+          sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm -v $PWD/reports:/arachni/reports arachni/arachni:latest bin/arachni http://${DOCKER_CONTAINER_NAME_DAST}:8080/ --report-save-path=reports/arachni_report.afr'
+          //create Report
+          sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm --name=arachni_report  -v $PWD/reports:/arachni/reports arachni/arachni:latest bin/arachni_reporter reports/arachni_report.afr --reporter=json:outfile=reports/arachni_report.json'
+           //upload to defect dojo
+        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Arachni Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/arachni_report.json" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+
       }
+        }
+        stage('NIKTO'){
+          steps{
+            //get repo
+            sh 'git pull https://github.com/sullo/nikto.git'
+            //build image
+            sh 'cd nikto'
+            sh 'docker build . -t nikto:latest'
+            //run nikto
+            sh 'docker run --rm --net ${DOCKER_DAST_NET_NAME} -v $(pwd)/zap:/tmp nikto -h http://${DOCKER_CONTAINER_NAME_DAST}:8080 -o /tmp/nikto_report.xml'
+              //upload to defect dojo
+        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+
+          }
         }
         }
 
@@ -236,5 +252,12 @@ stage('DAST - OWASP ZAP') {
 
 
   }
+    stage('CLEANUP'){
+      steps{
+        //stop test container
+        sh 'docker container stop ${DOCKER_CONTAINER_NAME_DAST}'
+      }
+    }
+
 }
 }
