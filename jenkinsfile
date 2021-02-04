@@ -198,8 +198,8 @@ pipeline {
           //make sure app is runnig
           sleep(time: 10, unit: "SECONDS")
           sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/'
-          sh 'docker run --net zapnet --rm -v $PWD/reports:/arachni/reports ahannigan/docker-arachni bin/arachni http://apptest:8080/ --report-save-path=reports/arachni_report.afr'
-          sh 'docker run --net zapnet --rm --name=arachni_report  -v $PWD/reports:/arachni/reports ahannigan/docker-arachni bin/arachni_reporter reports/arachni_report.afr --reporter=json:outfile=reports/arachni_report.json'
+          sh 'docker run --net zapnet --rm -v $PWD/reports:/arachni/reports arachni/arachni:latest bin/arachni http://apptest:8080/ --report-save-path=reports/arachni_report.afr'
+          sh 'docker run --net zapnet --rm --name=arachni_report  -v $PWD/reports:/arachni/reports arachni/arachni:latest bin/arachni_reporter reports/arachni_report.afr --reporter=json:outfile=reports/arachni_report.json'
       }
         }
 
