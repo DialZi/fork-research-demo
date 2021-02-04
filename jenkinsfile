@@ -13,6 +13,7 @@ sonarqube: localhost:9000
     set url=http://{sonarqube}/api, toolType=SonarQube, authentication type=API Key, username+API Key = sonarqube API Key
 
 ports:
+80    cakefactory
 8080  jenkins
 8081  defect dojo
 9000  sonarqube
@@ -34,6 +35,7 @@ pipeline {
     DEFECT_DOJO_KEY = credentials('defectDojoApiKey')
     JAVA_PROJECT_NAME = 'demoProject-0.0.1'
     DOCKER_IMAGE_NAME = 'cakefactory'
+    DOCKER_CONTAINER_NAME = 'cakefactory'
     JENKINS_PROJECT_NAME = 'demo'
     DEPENDENCY_CHECK_URL = 'https://raw.githubusercontent.com/domi810/demo/master/owasp-dependency-check.sh'
     CLAIR_SCANNER_URL = 'https://raw.githubusercontent.com/domi810/demo/master/clair-scanner_linux_386'
@@ -171,6 +173,18 @@ pipeline {
         sh 'docker container stop clair || true'
         //upload to defect dojo
         sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Clair Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/clair_report.json;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+      }
+    }
+
+      stage('DEPLOY') {
+      steps {
+        //stop runnig container
+        sh 'docker stop ${DOCKER_CONTAINER_NAME} || true'
+        //run 
+        sh 'docker run -d -p 80:8080 --rm --name ${DOCKER_CONTAINER_NAME} ${DOCKER_IMAGE_NAME}:latest'
+        //make sure app is runnig
+        sleep(time: 10, unit: "SECONDS")
+        sh 'docker run --rm curlimages/curl http://${DOCKER_CONTAINER_NAME}:8080/'
       }
     }
   }
