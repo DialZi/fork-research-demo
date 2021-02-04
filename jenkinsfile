@@ -242,6 +242,7 @@ stage('INIT DAST'){
             //inspect image
             sh 'docker image inspect nikto:latest'
             sh 'cd ..'
+            sh 'ls'
             //run nikto
             sh 'docker run --rm --net ${DOCKER_DAST_NET_NAME} --name nikto -v $(pwd)/zap:/tmp nikto -h http://${DOCKER_CONTAINER_NAME_DAST}:8080 -o /tmp/nikto_report.xml'
             //stop container
