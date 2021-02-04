@@ -192,9 +192,7 @@ pipeline {
       }
     }*/
         stage('DAST'){
-          steps{
-
-          }
+          sh 'ls'
           parallel{
              steps {
         //stop test container if already started
