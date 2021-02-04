@@ -48,8 +48,8 @@ pipeline {
     stage('BUILD') {
       steps {
 
-        sh 'mkdir nikto'
-        sh 'cd nikto'
+        sh 'mkdir dummy'
+        sh 'cd dummy'
         sh 'ls -l'
       }
     }
