@@ -44,22 +44,6 @@ pipeline {
     DOCKERFILE_URL = 'https://raw.githubusercontent.com/domi810/demo/master/Dockerfile'
   }
   stages {
-    stage('BUILD DOCKER IMAGE') {
-      steps {
-        //create tmp dir
-        sh 'mkdir tmp'
-        //copy target folder
-        sh 'cp -r target tmp/'
-        //get newest dockerfile
-        sh 'wget ${DOCKERFILE_URL} -P ./tmp'
-        //build image
-        sh 'docker build ./tmp -t ${DOCKER_IMAGE_NAME}:latest'
-        //inspect image
-        sh 'docker image inspect ${DOCKER_IMAGE_NAME}'
-        //delete tmp folder
-        sh 'rm -r tmp'
-      }
-    }
 
     /*stage('INIT') {
       steps {
@@ -83,21 +67,17 @@ pipeline {
 
     stage('BUILD DOCKER IMAGE') {
       steps {
-        //create tmp dir
+       //create tmp dir
         sh 'mkdir tmp'
         //copy target folder
         sh 'cp -r target tmp/'
-        sh 'cd tmp'
-        //remove dockerfile if exists
-        sh 'rm Dockerfile* || true'
         //get newest dockerfile
-        sh 'wget ${DOCKERFILE_URL}'
+        sh 'wget ${DOCKERFILE_URL} -P ./tmp'
         //build image
-        sh 'docker build . -t ${DOCKER_IMAGE_NAME}:latest'
+        sh 'docker build ./tmp -t ${DOCKER_IMAGE_NAME}:latest'
         //inspect image
         sh 'docker image inspect ${DOCKER_IMAGE_NAME}'
         //delete tmp folder
-        sh 'cd ..'
         sh 'rm -r tmp'
       }
     }
@@ -252,28 +232,18 @@ pipeline {
         stage('NIKTO'){
           steps{
             //get repo
-            //sh 'git clone https://github.com/sullo/nikto.git || true'
+            sh 'git clone https://github.com/sullo/nikto.git'
             //build image
-            //sh 'mkdir niktorepo && cd niktorepo'
-            sh 'cd niktorepo'
-
-            sh 'ls -l'
-            //get repo
-            sh 'git clone https://github.com/sullo/nikto.git || true'
-            sh 'cd nikto'
-            sh 'ls -l'
-            sh 'docker build . -t nikto:latest'
+            sh 'docker build ./nikto -t nikto:latest'
             //inspect image
             sh 'docker image inspect nikto:latest'
-            sh 'cd ..'
-            sh 'ls -l'
             //run nikto
             sh 'docker run --rm --net ${DOCKER_DAST_NET_NAME} --name nikto -v $(pwd)/zap:/tmp nikto -h http://${DOCKER_CONTAINER_NAME_DAST}:8080 -o /tmp/nikto_report.xml'
             //stop container
             sh 'docker container stop nikto'
             //upload to defect dojo
             sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
-
+            sh 'rm -r nikto'
           }
         }
       
