@@ -45,7 +45,7 @@ pipeline {
   }
   stages {
 
-    /*stage('INIT') {
+    stage('INIT') {
       steps {
         //workarounds for testing
         sh 'docker-compose -f /home/domi/django-DefectDojo/docker-compose.yml up -d || true'
@@ -82,7 +82,7 @@ pipeline {
       }
     }
 
-    stage('DEPLOY TO DEV') {
+    /*stage('DEPLOY TO DEV') {
       steps {
         //stop runnig container
         sh 'docker stop ${DOCKER_CONTAINER_NAME} || true'
@@ -191,7 +191,7 @@ pipeline {
       }
     }*/
 
-/*stage('INIT DAST'){
+stage('INIT DAST'){
   steps{
         //stop test container if already started
         sh 'docker container stop ${DOCKER_CONTAINER_NAME_DAST} || true'
@@ -203,7 +203,7 @@ pipeline {
         sleep(time: 10, unit: "SECONDS")
         sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm curlimages/curl http://${DOCKER_CONTAINER_NAME_DAST}:8080/'
   }
-}*/
+}
 
         //stage('DAST'){
           
