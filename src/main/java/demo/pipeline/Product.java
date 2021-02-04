@@ -14,6 +14,5 @@ public class Product {
     public int Id;
     public String Name;
     public Double Price;
-    public String ImagePath;
     public String Image;
 }

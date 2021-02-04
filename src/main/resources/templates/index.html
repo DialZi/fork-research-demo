@@ -72,7 +72,8 @@
           </ol>
           <div class="carousel-inner" role="listbox">
             <div th:each="prod : ${Products}" th:class="${prodStat.first} ? 'carousel-item active' : 'carousel-item'">
-              <img class="d-block img-fluid" th:src="@{${'data:image/png;base64,'+ prod.Image}}" width="900">
+              <img class="d-block img-fluid" th:src="${prod.Image}" width="900">
+              <!-- <img class="d-block img-fluid" th:src="@{${'data:image/png;base64,'+ prod.Image}}" width="900"> -->
             </div>
           </div>
           <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -89,7 +90,7 @@
 
           <div th:each="prod : ${Products}" class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100">
-              <img class="card-img-top" th:src="@{${'data:image/png;base64,'+ prod.Image}}" alt="">
+              <img class="card-img-top" th:src="${prod.Image}" alt="">
               <div class="card-body">
                 <h4 class="card-title" th:text=${prod.Name}>
                   <a href="#"></a>
