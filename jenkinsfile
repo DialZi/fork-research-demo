@@ -194,7 +194,7 @@ pipeline {
         stage('ARACHNI'){
           steps{
           //start cakefatory
-          sh 'docker run --net zapnet -d -p 8085:8080 --rm --name apptest cakefactory:latest'
+          //sh 'docker run --net zapnet -d -p 8085:8080 --rm --name apptest cakefactory:latest'
           //make sure app is runnig
           sleep(time: 10, unit: "SECONDS")
           sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/'
