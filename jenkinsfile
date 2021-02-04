@@ -91,7 +91,7 @@ pipeline {
         sh 'docker run -d -p 80:8080 --rm --name ${DOCKER_CONTAINER_NAME} ${DOCKER_IMAGE_NAME}:latest'
         //make sure app is runnig
         sleep(time: 10, unit: "SECONDS")
-        sh 'docker run --rm curlimages/curl http://${DOCKER_CONTAINER_NAME}:8080/'
+        sh 'docker run --rm curlimages/curl http://${DOCKER_CONTAINER_NAME}'
       }
     }
 
