@@ -239,10 +239,16 @@ stage('INIT DAST'){
             //build image
             sh 'cd nikto'
             sh 'docker build . -t nikto:latest'
+            //inspect image
+            sh 'docker image inspect nikto:latest'
+            sh 'cd ..'
+            sh ''
             //run nikto
-            sh 'docker run --rm --net ${DOCKER_DAST_NET_NAME} -v $(pwd)/zap:/tmp nikto -h http://${DOCKER_CONTAINER_NAME_DAST}:8080 -o /tmp/nikto_report.xml'
-              //upload to defect dojo
-        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+            sh 'docker run --rm --net ${DOCKER_DAST_NET_NAME} --name nikto -v $(pwd)/zap:/tmp nikto -h http://${DOCKER_CONTAINER_NAME_DAST}:8080 -o /tmp/nikto_report.xml'
+            //stop container
+            sh 'docker container stop nikto'
+            //upload to defect dojo
+            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
 
           }
         }
