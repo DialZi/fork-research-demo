@@ -1,5 +1,6 @@
 /*
 jenkins:localhost:8080
+  add user jenkins to docker usergroup
 
 defect dojo: localhost:8081 >>>> update port in docker compose file. default = 8080
   git clone https://github.com/DefectDojo/django-DefectDojo
@@ -32,6 +33,7 @@ pipeline {
     DEFECT_DOJO_IP = 'http://172.16.1.4:8081'
     DEFECT_DOJO_KEY = credentials('defectDojoApiKey')
     JAVA_PROJECT_NAME = 'demoProject-0.0.1'
+    DOCKER_IMAGE_NAME = 'cakefactory'
     JENKINS_PROJECT_NAME = 'demo'
     DEPENDENCY_CHECK_URL = 'https://raw.githubusercontent.com/domi810/demo/master/owasp-dependency-check.sh'
     CLAIR_SCANNER_URL = 'https://raw.githubusercontent.com/domi810/demo/master/clair-scanner_linux_386'
@@ -129,10 +131,22 @@ pipeline {
 
     stage('BUILD DOCKER IMAGE'){
       steps{
-        //remove binary if exists
+        //create tmp dir
+        sh 'mkdir tmp'
+        //copy target folder
+        sh 'cp -r target tmp/'
+        sh 'cd tmp'
+        //remove dockerfile if exists
         sh 'rm Dockerfile* || true'
-        //get newest binary
+        //get newest dockerfile
         sh 'wget ${DOCKERFILE_URL}'
+        //build image
+        sh 'docker build . -t ${DOCKER_IMAGE_NAME}:latest'
+        //inspect image
+        sh 'docker image inspect ${DOCKER_IMAGE_NAME}'
+        //delete tmp folder
+        sh 'cd ..'
+        sh 'rm -r tmp'
       }
     }
 
@@ -151,8 +165,8 @@ pipeline {
         sh './clair-scanner_linux_386  --ip 172.17.0.1 -r clair_report.json postgres || true'
         sh 'cat clair_report.json'
         //stop clair containers
-        //sh 'docker container stop clair_db'
-        //sh 'docker container stop clair'
+        sh 'docker container stop clair_db || true'
+        sh 'docker container stop clair || true'
         //upload to defect dojo
         sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Clair Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/clair_report.json;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
       }
