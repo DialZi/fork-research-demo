@@ -164,7 +164,9 @@ pipeline {
         }
 
       }
-    }*/
+    }
+
+
 
     stage('DAST - OWASP ZAP') {
       steps {
@@ -179,9 +181,6 @@ pipeline {
         //make sure app is runnig
         sleep(time: 10, unit: "SECONDS")
         sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/'
-        sh 'docker run --rm -v $PWD/reports:/arachni/reports ahannigan/docker-arachni bin/arachni http://apptest:8080/ --report-save-path=reports/example.io.afr'
-        sh 'docker run --rm --name=arachni_report  -v $PWD/reports:/arachni/reports ahannigan/docker-arachni bin/arachni_reporter reports/example.io.afr --reporter=html:outfile=reports/example-io-report.html'
-
         //run zap docker. go on on error. make sure folder is owned by same uid as user zap in docker
         sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/ -j -g gen.conf -x zap_report.xml || true'
         //upload to defect dojo
@@ -191,7 +190,20 @@ pipeline {
 
 
       }
-    }
+    }*/
+        stage('ARACHNI'){
+          steps{
+          //start cakefatory
+          sh 'docker run --net zapnet -d -p 8085:8080 --rm --name apptest cakefactory:latest'
+          //make sure app is runnig
+          sleep(time: 10, unit: "SECONDS")
+          sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/'
+          sh 'docker run --net zapnet --rm -v $PWD/reports:/arachni/reports ahannigan/docker-arachni bin/arachni http://apptest:8080/ --report-save-path=reports/example.io.afr'
+          sh 'docker run --net zapnet --rm --name=arachni_report  -v $PWD/reports:/arachni/reports ahannigan/docker-arachni bin/arachni_reporter reports/example.io.afr --reporter=html:outfile=reports/example-io-report.html'
+      }
+        }
+
+
 
   }
 }
