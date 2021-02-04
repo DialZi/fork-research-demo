@@ -231,6 +231,7 @@ stage('INIT DAST'){
         }*/
         stage('NIKTO'){
           steps{
+            sh 'rm -r nikto || true'
             //get repo
             sh 'git clone https://github.com/sullo/nikto.git'
             //build image
