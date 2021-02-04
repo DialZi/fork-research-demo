@@ -224,9 +224,9 @@ stage('INIT DAST'){
         stage('ARACHNI'){
           steps{
           //start arachni container
-          sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm -v $PWD/reports:/arachni/reports arachni/arachni:latest bin/arachni http://${DOCKER_CONTAINER_NAME_DAST}:8080/ --report-save-path=reports/arachni_report.afr'
+          sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm -v $(pwd)/reports:/arachni/reports arachni/arachni:latest bin/arachni http://${DOCKER_CONTAINER_NAME_DAST}:8080/ --report-save-path=reports/arachni_report.afr'
           //create Report
-          sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm --name=arachni_report  -v $PWD/reports:/arachni/reports arachni/arachni:latest bin/arachni_reporter reports/arachni_report.afr --reporter=json:outfile=reports/arachni_report.json'
+          sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm --name=arachni_report  -v $(pwd)/reports:/arachni/reports arachni/arachni:latest bin/arachni_reporter reports/arachni_report.afr --reporter=json:outfile=reports/arachni_report.json'
            //upload to defect dojo
         sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Arachni Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/arachni_report.json" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
 
@@ -238,6 +238,7 @@ stage('INIT DAST'){
             sh 'git clone https://github.com/sullo/nikto.git || true'
             //build image
             sh 'cd nikto'
+            sh 'ls'
             sh 'docker build . -t nikto:latest'
             //inspect image
             sh 'docker image inspect nikto:latest'
