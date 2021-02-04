@@ -47,12 +47,14 @@ pipeline {
 
     stage('BUILD') {
       steps {
-        sh 'mvn clean package'
+        //sh 'mvn clean package'
         //change name of the war file do run the app under the root path
         sh 'cd target && ls -l'
         sh 'mv target/${JAVA_PROJECT_NAME}.war target/ROOT.war'
         sh 'cd target && ls -l'
-        sh 'cd niktorepo'
+
+        sh 'mkdir nikto'
+        sh 'cd nikto'
         sh 'ls -l'
       }
     }
