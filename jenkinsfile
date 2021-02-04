@@ -50,19 +50,17 @@ pipeline {
         sh 'mkdir tmp'
         //copy target folder
         sh 'cp -r target tmp/'
-        sh 'cd tmp'
-        sh 'ls -l'
         //remove dockerfile if exists
         sh 'rm Dockerfile* || true'
         //get newest dockerfile
-        sh 'wget ${DOCKERFILE_URL}'
+        sh 'wget ${DOCKERFILE_URL} -P /tmp'
         //build image
-        sh 'docker build . -t ${DOCKER_IMAGE_NAME}:latest'
+        sh 'docker build /tmp -t ${DOCKER_IMAGE_NAME}:latest'
         //inspect image
         sh 'docker image inspect ${DOCKER_IMAGE_NAME}'
         //delete tmp folder
         sh 'cd ..'
-        sh 'rm -r tmp'
+        //sh 'rm -r tmp'
       }
     }
 
