@@ -235,7 +235,8 @@ stage('INIT DAST'){
         stage('NIKTO'){
           steps{
             //get repo
-            sh 'git clone https://github.com/sullo/nikto.git'
+            sh 'git clone https://github.com/sullo/nikto.git || true'
+            sh 'git pull https://github.com/sullo/nikto.git'
             //build image
             sh 'cd nikto'
             sh 'docker build . -t nikto:latest'
