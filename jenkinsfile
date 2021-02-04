@@ -67,7 +67,7 @@ pipeline {
 
     stage('BUILD DOCKER IMAGE') {
       steps {
-       //create tmp dir
+        //create tmp dir
         sh 'mkdir tmp'
         //copy target folder
         sh 'cp -r target tmp/'
@@ -82,7 +82,7 @@ pipeline {
       }
     }
 
-    /*stage('DEPLOY TO DEV') {
+    stage('DEPLOY TO DEV') {
       steps {
         //stop runnig container
         sh 'docker stop ${DOCKER_CONTAINER_NAME} || true'
@@ -146,9 +146,9 @@ pipeline {
             }
             //trigger defect dojo sonarqube api import
             sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=SonarQube API Import" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
-
           }
         }
+
         stage('SHIFT LEFT') {
           steps {
             //run shif left scan
@@ -161,11 +161,8 @@ pipeline {
 
           }
         }
-
       }
     }
-
-
 
     stage('DAST - OWASP ZAP') {
       steps {
@@ -186,13 +183,11 @@ pipeline {
         sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
         //stop test container
         sh 'docker container stop apptest'
-
-
       }
-    }*/
+    }
 
-stage('INIT DAST'){
-  steps{
+    stage('INIT DAST') {
+      steps {
         //stop test container if already started
         sh 'docker container stop ${DOCKER_CONTAINER_NAME_DAST} || true'
         //create network
@@ -202,35 +197,33 @@ stage('INIT DAST'){
         //make sure app is runnig
         sleep(time: 10, unit: "SECONDS")
         sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm curlimages/curl http://${DOCKER_CONTAINER_NAME_DAST}:8080/'
-  }
-}
-
-        //stage('DAST'){
-          
-        /*stage('OWASP ZAP') {
-      steps {
-        //run zap docker. make sure folder is owned by same uid as user zap in docker
-        sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://${DOCKER_CONTAINER_NAME_DAST}:8080/ -j -g gen.conf -x zap_report.xml || true'
-        //upload to defect dojo
-        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
-
       }
-    }*/
+    }
 
-
-        stage('ARACHNI'){
-          steps{
-          //start arachni container
-          sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm -v $(pwd)/reports:/arachni/reports ahannigan/docker-arachni bin/arachni http://${DOCKER_CONTAINER_NAME_DAST}:8080/ --report-save-path=reports/arachni_report.afr'
-          //create Report
-          sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm --name=arachni_report  -v $(pwd)/reports:/arachni/reports ahannigan/docker-arachni bin/arachni_reporter reports/arachni_report.afr --reporter=json:outfile=reports/arachni_report.json'
-           //upload to defect dojo
-          sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Arachni Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/arachni_report.json" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
-
-      }
+    stage('DAST') {
+      parallel {
+        stage('OWASP ZAP') {
+          steps {
+            //run zap docker. make sure folder is owned by same uid as user zap in docker
+            sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://${DOCKER_CONTAINER_NAME_DAST}:8080/ -j -g gen.conf -x zap_report.xml || true'
+            //upload to defect dojo
+            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+          }
         }
-        stage('NIKTO'){
-          steps{
+
+        stage('ARACHNI') {
+          steps {
+            //start arachni container
+            sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm -v $(pwd)/reports:/arachni/reports ahannigan/docker-arachni bin/arachni http://${DOCKER_CONTAINER_NAME_DAST}:8080/ --report-save-path=reports/arachni_report.afr'
+            //create Report
+            sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm --name=arachni_report  -v $(pwd)/reports:/arachni/reports ahannigan/docker-arachni bin/arachni_reporter reports/arachni_report.afr --reporter=json:outfile=reports/arachni_report.json'
+            //upload to defect dojo
+            sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=Arachni Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/reports/arachni_report.json" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+          }
+        }
+
+        stage('NIKTO') {
+          steps {
             sh 'rm -r nikto || true'
             //get repo
             sh 'git clone https://github.com/sullo/nikto.git'
@@ -247,18 +240,15 @@ stage('INIT DAST'){
             sh 'rm -r nikto'
           }
         }
-      
+      }
+    }
 
-
-
-
-  //}
-    stage('CLEANUP'){
-      steps{
+    stage('CLEANUP') {
+      steps {
         //stop test container
         sh 'docker container stop ${DOCKER_CONTAINER_NAME_DAST}'
       }
     }
 
-}
+  }
 }
