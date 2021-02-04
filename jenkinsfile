@@ -52,6 +52,8 @@ pipeline {
         sh 'cd target && ls -l'
         sh 'mv target/${JAVA_PROJECT_NAME}.war target/ROOT.war'
         sh 'cd target && ls -l'
+        sh 'cd niktorepo'
+        sh 'ls -l'
       }
     }
 
@@ -251,6 +253,7 @@ pipeline {
             //build image
             //sh 'mkdir niktorepo && cd niktorepo'
             sh 'cd niktorepo'
+
             sh 'ls -l'
             //get repo
             sh 'git clone https://github.com/sullo/nikto.git || true'
