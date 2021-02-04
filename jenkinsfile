@@ -249,7 +249,8 @@ pipeline {
             //get repo
             //sh 'git clone https://github.com/sullo/nikto.git || true'
             //build image
-            sh 'mkdir niktorepo && cd niktorepo'
+            //sh 'mkdir niktorepo && cd niktorepo'
+            sh 'cd niktorepo'
             sh 'ls -l'
             //get repo
             sh 'git clone https://github.com/sullo/nikto.git || true'
