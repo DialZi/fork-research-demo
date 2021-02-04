@@ -208,7 +208,7 @@ pipeline {
   }
 }*/
 
-        stage('DAST'){
+        //stage('DAST'){
           
         /*stage('OWASP ZAP') {
       steps {
@@ -262,7 +262,7 @@ pipeline {
 
 
 
-  }
+  //}
     stage('CLEANUP'){
       steps{
         //stop test container
