@@ -30,7 +30,7 @@ pipeline {
   }
 
   environment {
-    DEFECT_DOJO_ENGAGEMENT_ID = '9'
+    DEFECT_DOJO_ENGAGEMENT_ID = '10'
     DEFECT_DOJO_IP = 'http://172.16.1.4:8081'
     DEFECT_DOJO_KEY = credentials('defectDojoApiKey')
     JAVA_PROJECT_NAME = 'demoProject-0.0.1'
@@ -191,7 +191,33 @@ pipeline {
 
       }
     }*/
-        stage('ARACHNI'){
+        stage('DAST'){
+          steps{
+
+          }
+          parallel{
+             steps {
+        //stop test container if already started
+        sh 'docker container stop apptest || true'
+        //create network
+        sh 'docker network create zapnet || true'
+        //start docker with the test war. 
+        //sh 'docker run --net zapnet -d -p 8085:8080 --rm -v /home/jenkins/workspace/${JENKINS_PROJECT_NAME}/target/ROOT.war:/usr/local/tomcat/webapps/ROOT.war --name apptest tomcat'
+        //start cakefatory
+        sh 'docker run --net zapnet -d -p 8085:8080 --rm --name apptest cakefactory:latest'
+        //make sure app is runnig
+        sleep(time: 10, unit: "SECONDS")
+        sh 'docker run --net zapnet --rm curlimages/curl http://apptest:8080/'
+        //run zap docker. go on on error. make sure folder is owned by same uid as user zap in docker
+        sh 'docker run --net zapnet --rm -v $(pwd)/zap:/zap/wrk:rw  -t owasp/zap2docker-stable zap-full-scan.py -t http://apptest:8080/ -j -g gen.conf -x zap_report.xml || true'
+        //upload to defect dojo
+        sh 'curl -X POST "${DEFECT_DOJO_IP}/api/v2/import-scan/"  -H "Authorization: Token ${DEFECT_DOJO_KEY}"  -H  "accept: application/json" -H   "Content-Type: multipart/form-data" -F "minimum_severity=Info" -F "active=true" -F "verified=true" -F "scan_type=ZAP Scan" -F "file=@/home/jenkins/workspace/${JENKINS_PROJECT_NAME}/zap/zap_report.xml;type=text/xml" -F "engagement=${DEFECT_DOJO_ENGAGEMENT_ID}" -F "close_old_findings=false" -F "push_to_jira=false"'
+        //stop test container
+        sh 'docker container stop apptest'
+
+          }
+
+                  stage('ARACHNI'){
           steps{
           //start cakefatory
           //sh 'docker run --net zapnet -d -p 8085:8080 --rm --name apptest cakefactory:latest'
@@ -202,6 +228,8 @@ pipeline {
           sh 'docker run --net zapnet --rm --name=arachni_report  -v $PWD/reports:/arachni/reports arachni/arachni:latest bin/arachni_reporter reports/arachni_report.afr --reporter=json:outfile=reports/arachni_report.json'
       }
         }
+        }
+
 
 
 
