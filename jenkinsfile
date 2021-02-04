@@ -209,7 +209,7 @@ pipeline {
 }*/
 
         stage('DAST'){
-          parallel{
+          
         /*stage('OWASP ZAP') {
       steps {
         //run zap docker. make sure folder is owned by same uid as user zap in docker
@@ -257,7 +257,7 @@ pipeline {
 
           }
         }
-        }
+      
 
 
 
