@@ -36,7 +36,7 @@ pipeline {
     JAVA_PROJECT_NAME = 'demoProject-0.0.1'
     DOCKER_IMAGE_NAME = 'cakefactory'
     DOCKER_CONTAINER_NAME = 'cakefactory'
-    DOCKER_CONTAINER_NAME_DAST = 'cakefactory_dast'
+    DOCKER_CONTAINER_NAME_DAST = 'cakefactorydast'
     DOCKER_DAST_NET_NAME = 'dastnet'
     JENKINS_PROJECT_NAME = 'demo'
     DEPENDENCY_CHECK_URL = 'https://raw.githubusercontent.com/domi810/demo/master/owasp-dependency-check.sh'
@@ -201,7 +201,7 @@ stage('INIT DAST'){
         //create network
         sh 'docker network create ${DOCKER_DAST_NET_NAME} || true'
         //start cakefatory
-        sh 'docker run --net ${DOCKER_DAST_NET_NAME} -d -p 8085:8080 --rm --name ${DOCKER_CONTAINER_NAME_DAST} cakefactory:latest'
+        sh 'docker run --net ${DOCKER_DAST_NET_NAME} -d -p 8085:8080 --rm --name ${DOCKER_CONTAINER_NAME_DAST} ${DOCKER_IMAGE_NAME}:latest'
         //make sure app is runnig
         sleep(time: 10, unit: "SECONDS")
         sh 'docker run --net ${DOCKER_DAST_NET_NAME} --rm curlimages/curl http://${DOCKER_CONTAINER_NAME_DAST}:8080/'
