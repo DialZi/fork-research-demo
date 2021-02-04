@@ -50,8 +50,6 @@ pipeline {
         sh 'docker-compose -f /home/domi/django-DefectDojo/docker-compose.yml up -d || true'
         sh 'docker run -d -p 9000:9000 --name sonarqube_jenkins sonarqube || true'
         sh 'docker container start sonarqube_jenkins || true'
-        //get nikto repo
-        //sh 'git clone https://github.com/sullo/nikto.git || true'
       }
 
     }
@@ -239,6 +237,10 @@ pipeline {
             //get repo
             //sh 'git clone https://github.com/sullo/nikto.git || true'
             //build image
+            sh 'mkdir niktorepo && cd niktorepo'
+            sh 'ls -l'
+            //get repo
+            sh 'git clone https://github.com/sullo/nikto.git || true'
             sh 'cd nikto'
             sh 'ls -l'
             sh 'docker build . -t nikto:latest'
