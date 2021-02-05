@@ -145,7 +145,7 @@ pipeline {
           }
         }
 
-        stage('SHIFT LEFT') {
+        stage('SAST SCAN') {
           steps {
             //run shif left scan
             sh 'docker run --rm -e "WORKSPACE=${PWD}" -v $PWD:/app --name shift_left_scan shiftleft/sast-scan scan  --build --out_dir /app/reports || true'
