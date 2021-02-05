@@ -78,7 +78,7 @@ pipeline {
         //inspect image
         sh 'docker image inspect ${DOCKER_IMAGE_NAME}'
         //delete tmp folder
-        sh 'rm -r tmp'
+        sh 'rm -r tmp' 
       }
     }
 
