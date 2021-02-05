@@ -16,7 +16,7 @@ public class DemoController {
     @GetMapping
     public String demoGet(Model model, String name) {
 
-        Random rand = new Random();
+        
         if ((name == null) || (!name.isEmpty())) {
             name = "unknown";
         }
@@ -27,7 +27,7 @@ public class DemoController {
     @PostMapping
     public String demoPost(Model model, String name) {
 
-        Random rand = new Random();
+        
         model.addAttribute("name", name);
         return "demo";
     }
