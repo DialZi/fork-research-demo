@@ -91,7 +91,7 @@ pipeline {
       }
     }
 
-    stage('DOCKER IMAGE SECURITY - Clair ') {
+    stage('DOCKER IMAGE SECURITY') {
       steps {
         //remove binary if exists
         sh 'rm clair-scanner_* || true'
@@ -113,7 +113,7 @@ pipeline {
       }
     }
 
-    stage('SCA - OWSAP Dependency Check') {
+    stage('SCA') {
 
       steps {
         //remove file if exists
