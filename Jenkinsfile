@@ -4,6 +4,7 @@ jenkins:localhost:8080
 
 defect dojo: localhost:8081 >>>> update port in docker compose file. default = 8080
   git clone https://github.com/DefectDojo/django-DefectDojo
+  set sonarqube project key xxx:xxxxx
 
 sonarqube: localhost:9000
   get api key.
@@ -30,7 +31,7 @@ pipeline {
   }
 
   environment {
-    DEFECT_DOJO_ENGAGEMENT_ID = '10'
+    DEFECT_DOJO_ENGAGEMENT_ID = '12'
     DEFECT_DOJO_IP = 'http://172.16.1.4:8081'
     DEFECT_DOJO_KEY = credentials('defectDojoApiKey')
     JAVA_PROJECT_NAME = 'demoProject-0.0.1'
